@@ -397,33 +397,6 @@
                 <button class="button" onclick="addNewMaterial()">Add Material</button>
             </div>
             
-            <div class="form-group">
-                <h3>Add New Product</h3>
-                <input type="text" id="newProductName" placeholder="Product Name">
-                
-                <div class="material-selection">
-                    <select id="newMaterial1">
-                        <option value="NONE">Select Material 1</option>
-                    </select>
-                    <input type="number" id="newQuantity1" placeholder="Quantity">
-                </div>
-                
-                <div class="material-selection">
-                    <select id="newMaterial2">
-                        <option value="NONE">Select Material 2</option>
-                    </select>
-                    <input type="number" id="newQuantity2" placeholder="Quantity">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <h3>Add New Material</h3>
-                <input type="text" id="newMaterialName" placeholder="Material Name">
-                <input type="number" id="newQtyPerPack" placeholder="Quantity Per Pack">
-                <input type="number" id="newTotalAmount" placeholder="Total Amount">utton onclick="exportMaterials()">Export Materials to CSV</button>
-                <button onclick="addNewMaterial()" id="addMaterialBtn">Add Material</button>div>
-            </div>div>
-                </div>
             <div class="admin-panel">
                 <h3>Export Data</h3>
                 <button class="button" onclick="exportProducts()">Export Products</button>
@@ -434,18 +407,17 @@
 
     <script>
         // Sample data
-        let materials = [,
+        let materials = [
             { name: "NONE", qtyPerPack: 0, totalAmount: 0, costPerPiece: 0 },
-            { name: "QUAFF Photo Paper A4 - 115 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },,
-                { name: "QUAFF Photo Paper A4 - 135 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
-                { name: "QUAFF Photo Paper A4 - 180 GSM", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
-                { name: "QUAFF Photo Paper A4 - 200 GSM", qtyPerPack: 100, totalAmount: 460, costPerPiece: 4.6 },
-                { name: "QUAFF Photo Paper A4 - 230 GSM", qtyPerPack: 100, totalAmount: 480, costPerPiece: 4.8 },
-                { name: "SnowWhite Board", qtyPerPack: 100, totalAmount: 800, costPerPiece: 8 },
-                { name: "Generic Sticker Paper - White Glossy", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
-                { name: "Generic Sticker Paper - White Matte", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
-                { name: "Generic Sticker Paper - Clear Glossy", qtyPerPack: 100, totalAmount: 550, costPerPiece: 5.5 }
-            ];
+            { name: "QUAFF Photo Paper A4 - 115 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
+            { name: "QUAFF Photo Paper A4 - 135 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
+            { name: "QUAFF Photo Paper A4 - 180 GSM", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+            { name: "QUAFF Photo Paper A4 - 200 GSM", qtyPerPack: 100, totalAmount: 460, costPerPiece: 4.6 },
+            { name: "QUAFF Photo Paper A4 - 230 GSM", qtyPerPack: 100, totalAmount: 480, costPerPiece: 4.8 },
+            { name: "SnowWhite Board", qtyPerPack: 100, totalAmount: 800, costPerPiece: 8 },
+            { name: "Generic Sticker Paper - White Glossy", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+            { name: "Generic Sticker Paper - White Matte", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+            { name: "Generic Sticker Paper - Clear Glossy", qtyPerPack: 100, totalAmount: 550, costPerPiece: 5.5 },
             { name: "Generic Sticker Paper - Clear Matte", qtyPerPack: 100, totalAmount: 550, costPerPiece: 5.5 },
             { name: "KIMLON Hard Card 180g", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
             { name: "KIMLON Hard Card 220g", qtyPerPack: 100, totalAmount: 380, costPerPiece: 3.8 },
@@ -455,322 +427,317 @@
         let productRecipes = [
             { 
                 name: "4R Photo Print",
-                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["0.25", "", "", "", ""],
+                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE"],
+                quantities: ["0.25", "", ""],
                 totalCost: 1.15
             },
             { 
                 name: "A4 Photo Print - 200 GSM",
-                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["1", "", "", "", ""],
+                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE"],
+                quantities: ["1", "", ""],
                 totalCost: 4.6
             },
             { 
                 name: "A4 Certificate Print",
-                materials: ["QUAFF Photo Paper A4 - 230 GSM", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["1", "", "", "", ""],
+                materials: ["QUAFF Photo Paper A4 - 230 GSM", "NONE", "NONE"],
+                quantities: ["1", "", ""],
                 totalCost: 4.8
             },
             { 
                 name: "Business Card",
-                materials: ["KIMLON Hard Card 220g", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["0.1", "", "", "", ""],
+                materials: ["KIMLON Hard Card 220g", "NONE", "NONE"],
+                quantities: ["0.1", "", ""],
                 totalCost: 0.38
             },
             { 
                 name: "Sticker - White Glossy",
-                materials: ["Generic Sticker Paper - White Glossy", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["1", "", "", "", ""],
+                materials: ["Generic Sticker Paper - White Glossy", "NONE", "NONE"],
+                quantities: ["1", "", ""],
                 totalCost: 4.5
             },
             { 
                 name: "Sticker - White Matte",
-                materials: ["Generic Sticker Paper - White Matte", "NONE", "NONE", "NONE", "NONE"],
-                quantities: ["1", "", "", "", ""],
+                materials: ["Generic Sticker Paper - White Matte", "NONE", "NONE"],
+                quantities: ["1", "", ""],
                 totalCost: 4.5
             }
         ];
-loadMaterialOptions();
+
         // Initialize the app
-        window.onload = function() {t exist yet
+        window.onload = function() {
+            // Load data from local storage if it exists
+            if (localStorage.getItem('materials')) {
+                materials = JSON.parse(localStorage.getItem('materials'));
+            }
+            if (localStorage.getItem('productRecipes')) {
+                productRecipes = JSON.parse(localStorage.getItem('productRecipes'));
+            }
+            
             loadProductOptions();
-            loadMaterialsDatabase();lStorage.setItem('materials', JSON.stringify(materials));
+            loadMaterialsDatabase();
             loadProductRecipes();
-            updateDashboard();   materials = JSON.parse(localStorage.getItem('materials'));
-            loadMaterialOptions();}
-            
-            // Save data to localStorage if it doesn't exist yet
-            if (!localStorage.getItem('materials')) {lStorage.setItem('productRecipes', JSON.stringify(productRecipes));
-                localStorage.setItem('materials', JSON.stringify(materials));
-            } else {   productRecipes = JSON.parse(localStorage.getItem('productRecipes'));
-                materials = JSON.parse(localStorage.getItem('materials'));  }
-            }        };
-            
-            if (!localStorage.getItem('productRecipes')) {
-                localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
-            } else {
-                productRecipes = JSON.parse(localStorage.getItem('productRecipes'));content').forEach(tab => {
-            } tab.classList.add('hidden');
-        };});
+            loadMaterialOptions();
+            updateDashboard();
+        };
 
         // Navigation functions
-        function showTab(tabId) {document.getElementById(tabId).classList.remove('hidden');
+        function showTab(tabId) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');orEach(tab => {
-            }); tab.classList.remove('active');
+                tab.classList.add('hidden');
             });
-            // Show the selected tab
-            document.getElementById(tabId).classList.remove('hidden');e
             
-            // Update tab styling).includes(tabId.toLowerCase())) {
-            document.querySelectorAll('.tab').forEach(tab => {   tab.classList.add('active');
-                tab.classList.remove('active'); }
-            });   });
-                    }
+            // Show the selected tab
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update tab styling
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
             // Find the tab that was clicked and make it active
-            document.querySelectorAll('.tab').forEach(tab => {down
+            document.querySelectorAll('.tab').forEach(tab => {
                 if (tab.textContent.toLowerCase().includes(tabId.toLowerCase())) {
                     tab.classList.add('active');
-                }select.innerHTML = '<option value="">Select a product</option>';
+                }
             });
         }
-teElement('option');
+
         // Load product options in dropdown
-        function loadProductOptions() {t.name;
-            const select = document.getElementById('productSelect'); select.appendChild(option);
-            select.innerHTML = '<option value="">Select a product</option>';   });
-                    }
+        function loadProductOptions() {
+            const select = document.getElementById('productSelect');
+            select.innerHTML = '<option value="">Select a product</option>';
+            
             productRecipes.forEach(product => {
-                const option = document.createElement('option');duct creation
-                option.value = product.name;) {
+                const option = document.createElement('option');
+                option.value = product.name;
                 option.textContent = product.name;
                 select.appendChild(option);
             });
         }
-,
-        // Load material options for product creation  document.getElementById('newMaterial5')
-        function loadMaterialOptions() {];
+
+        // Load material options for product creation
+        function loadMaterialOptions() {
             const materialSelects = [
                 document.getElementById('newMaterial1'),
-                document.getElementById('newMaterial2'),select.innerHTML = '<option value="NONE">-- Select Material --</option>';
-                document.getElementById('newMaterial3'),
-                document.getElementById('newMaterial4'),
-                document.getElementById('newMaterial5')
-            ];eElement('option');
+                document.getElementById('newMaterial2'),
+                document.getElementById('newMaterial3')
+            ];
             
-            materialSelects.forEach(select => {al.name;
-                select.innerHTML = '<option value="NONE">-- Select Material --</option>';   select.appendChild(option);
-                 }
-                materials.forEach(material => { });
-                    if (material.name !== "NONE") {   });
-                        const option = document.createElement('option');        }
-                        option.value = material.name;
-                        option.textContent = material.name;
-                        select.appendChild(option);
-                    }t.getElementById('materialsDatabaseBody');
-                });tbody.innerHTML = '';
+            materialSelects.forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="NONE">-- Select Material --</option>';
+                    
+                    materials.forEach(material => {
+                        if (material.name !== "NONE") {
+                            const option = document.createElement('option');
+                            option.value = material.name;
+                            option.textContent = material.name;
+                            select.appendChild(option);
+                        }
+                    });
+                }
             });
         }
 
-        // Load materials databaseconst row = document.createElement('tr');
+        // Load materials database
         function loadMaterialsDatabase() {
-            const tbody = document.getElementById('materialsDatabaseBody');nt('td');
-            tbody.innerHTML = '';erial.name;
-            row.appendChild(nameCell);
+            const tbody = document.getElementById('materialsDatabaseBody');
+            tbody.innerHTML = '';
+            
             materials.forEach(material => {
-                if (material.name !== "NONE") {');
-                    const row = document.createElement('tr');erial.qtyPerPack;
-                    row.appendChild(qtyCell);
+                if (material.name !== "NONE") {
+                    const row = document.createElement('tr');
+                    
                     const nameCell = document.createElement('td');
                     nameCell.textContent = material.name;
-                    row.appendChild(nameCell);{material.totalAmount.toFixed(2)}`;
-                    row.appendChild(amountCell);
+                    row.appendChild(nameCell);
+                    
                     const qtyCell = document.createElement('td');
                     qtyCell.textContent = material.qtyPerPack;
-                    row.appendChild(qtyCell);{material.costPerPiece.toFixed(2)}`;
-                    row.appendChild(costCell);
+                    row.appendChild(qtyCell);
+                    
                     const amountCell = document.createElement('td');
-                    amountCell.textContent = `₱${material.totalAmount.toFixed(2)}`;   tbody.appendChild(row);
-                    row.appendChild(amountCell); }
-                       });
-                    const costCell = document.createElement('td');        }
+                    amountCell.textContent = `₱${material.totalAmount.toFixed(2)}`;
+                    row.appendChild(amountCell);
+                    
+                    const costCell = document.createElement('td');
                     costCell.textContent = `₱${material.costPerPiece.toFixed(2)}`;
                     row.appendChild(costCell);
                     
-                    tbody.appendChild(row);t.getElementById('productRecipesBody');
-                }tbody.innerHTML = '';
-            });
-        }
-const row = document.createElement('tr');
-        // Load product recipes
-        function loadProductRecipes() {ent('td');
-            const tbody = document.getElementById('productRecipesBody');duct.name;
-            tbody.innerHTML = '';row.appendChild(nameCell);
-            
-            productRecipes.forEach(product => {quantities (simplified from the Excel version)
-                const row = document.createElement('tr');
-                
-                const nameCell = document.createElement('td');duct.materials[i] !== "NONE" ? product.materials[i] : "";
-                nameCell.textContent = product.name;row.appendChild(materialCell);
-                row.appendChild(nameCell);
-                ;
-                // Add up to 3 materials and quantities (simplified from the Excel version)duct.quantities[i];
-                for (let i = 0; i < 3; i++) {   row.appendChild(quantityCell);
-                    const materialCell = document.createElement('td');}
-                    materialCell.textContent = product.materials[i] !== "NONE" ? product.materials[i] : "";
-                    row.appendChild(materialCell);
-                    {product.totalCost.toFixed(2)}`;
-                    const quantityCell = document.createElement('td');row.appendChild(costCell);
-                    quantityCell.textContent = product.quantities[i];
-                    row.appendChild(quantityCell); tbody.appendChild(row);
-                }   });
-                        }
-                const costCell = document.createElement('td');
-                costCell.textContent = `₱${product.totalCost.toFixed(2)}`;lection changes
-                row.appendChild(costCell);
-                e;
-                tbody.appendChild(row);const product = productRecipes.find(p => p.name === productName);
+                    tbody.appendChild(row);
+                }
             });
         }
 
-        // Update product details when selection changesrofitDetails();
-        function updateProductDetails() {   return;
-            const productName = document.getElementById('productSelect').value;}
+        // Load product recipes
+        function loadProductRecipes() {
+            const tbody = document.getElementById('productRecipesBody');
+            tbody.innerHTML = '';
+            
+            productRecipes.forEach(product => {
+                const row = document.createElement('tr');
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = product.name;
+                row.appendChild(nameCell);
+                
+                // Add up to 3 materials and quantities
+                for (let i = 0; i < 3; i++) {
+                    const materialCell = document.createElement('td');
+                    materialCell.textContent = product.materials[i] !== "NONE" ? product.materials[i] : "";
+                    row.appendChild(materialCell);
+                    
+                    const quantityCell = document.createElement('td');
+                    quantityCell.textContent = product.quantities[i];
+                    row.appendChild(quantityCell);
+                }
+                
+                const costCell = document.createElement('td');
+                costCell.textContent = `₱${product.totalCost.toFixed(2)}`;
+                row.appendChild(costCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update product details when selection changes
+        function updateProductDetails() {
+            const productName = document.getElementById('productSelect').value;
             const product = productRecipes.find(p => p.name === productName);
             
-            if (!product) {t.getElementById('materialsBody');
-                clearMaterialsTable();tbody.innerHTML = '';
+            if (!product) {
+                clearMaterialsTable();
                 updateProfitDetails();
-                return;let totalCost = 0;
+                return;
             }
             
             // Update materials table
-            const tbody = document.getElementById('materialsBody');const material = materials.find(m => m.name === product.materials[i]);
+            const tbody = document.getElementById('materialsBody');
             tbody.innerHTML = '';
             
-            let totalCost = 0;const row = document.createElement('tr');
+            let totalCost = 0;
             
-            for (let i = 0; i < product.materials.length; i++) {nt('td');
-                if (product.materials[i] !== "NONE" && product.materials[i] !== "") {erial.name;
-                    const material = materials.find(m => m.name === product.materials[i]);row.appendChild(nameCell);
+            for (let i = 0; i < product.materials.length; i++) {
+                if (product.materials[i] !== "NONE" && product.materials[i] !== "") {
+                    const material = materials.find(m => m.name === product.materials[i]);
                     
-                    if (material) {;
-                        const row = document.createElement('tr');duct.quantities[i];
-                        row.appendChild(quantityCell);
+                    if (material) {
+                        const row = document.createElement('tr');
+                        
                         const nameCell = document.createElement('td');
                         nameCell.textContent = material.name;
-                        row.appendChild(nameCell); || 0;
-                        y * material.costPerPiece;
-                        const quantityCell = document.createElement('td');totalCost += itemCost;
+                        row.appendChild(nameCell);
+                        
+                        const quantityCell = document.createElement('td');
                         quantityCell.textContent = product.quantities[i];
                         row.appendChild(quantityCell);
-                        {itemCost.toFixed(2)}`;
-                        // Calculate costrow.appendChild(costCell);
+                        
+                        // Calculate cost
                         let quantity = parseFloat(product.quantities[i]) || 0;
-                        let itemCost = quantity * material.costPerPiece;   tbody.appendChild(row);
-                        totalCost += itemCost;   }
-                           }
-                        const costCell = document.createElement('td');}
+                        let itemCost = quantity * material.costPerPiece;
+                        totalCost += itemCost;
+                        
+                        const costCell = document.createElement('td');
                         costCell.textContent = `₱${itemCost.toFixed(2)}`;
                         row.appendChild(costCell);
-                        document.getElementById('totalCost').textContent = `₱${totalCost.toFixed(2)}`;
+                        
                         tbody.appendChild(row);
-                    }ls
-                }   updateProfitDetails();
-            }        }
+                    }
+                }
+            }
             
             // Update total cost
             document.getElementById('totalCost').textContent = `₱${totalCost.toFixed(2)}`;
             
-            // Update profit details   document.getElementById('totalCost').textContent = '₱0.00';
-            updateProfitDetails();        }
+            // Update profit details
+            updateProfitDetails();
         }
 
         // Clear materials table
-        function clearMaterialsTable() {tent;
-            document.getElementById('materialsBody').innerHTML = '';const totalCost = parseFloat(totalCostText.replace('₱', '')) || 0;
+        function clearMaterialsTable() {
+            document.getElementById('materialsBody').innerHTML = '';
             document.getElementById('totalCost').textContent = '₱0.00';
-        }rofitMargin').value) || 0;
-n / 100);
-        // Update profit detailsconst estimatedProfit = sellingPrice - totalCost;
+        }
+
+        // Update profit details
         function updateProfitDetails() {
-            const totalCostText = document.getElementById('totalCost').textContent;document.getElementById('sellingPrice').textContent = `₱${sellingPrice.toFixed(2)}`;
+            const totalCostText = document.getElementById('totalCost').textContent;
             const totalCost = parseFloat(totalCostText.replace('₱', '')) || 0;
-            t');
+            
             const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
-            const sellingPrice = totalCost * (1 + profitMargin / 100);profitElement.className = estimatedProfit > 0 ? 'profit-positive' : 'profit-negative';
+            const sellingPrice = totalCost * (1 + profitMargin / 100);
             const estimatedProfit = sellingPrice - totalCost;
             
             document.getElementById('sellingPrice').textContent = `₱${sellingPrice.toFixed(2)}`;
-            / estimatedProfit) : 'N/A';
-            const profitElement = document.getElementById('estimatedProfit');document.getElementById('breakeven').textContent = breakeven;
+            
+            const profitElement = document.getElementById('estimatedProfit');
             profitElement.textContent = `₱${estimatedProfit.toFixed(2)}`;
             profitElement.className = estimatedProfit > 0 ? 'profit-positive' : 'profit-negative';
-            const competitorPrice = parseFloat(document.getElementById('competitorPrice').value) || 0;
+            
             // Breakeven analysis
             const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
             const breakeven = estimatedProfit > 0 ? Math.ceil(fixedCosts / estimatedProfit) : 'N/A';
-            document.getElementById('breakeven').textContent = breakeven;const priceDifferencePercent = (priceDifference / competitorPrice) * 100;
+            document.getElementById('breakeven').textContent = breakeven;
             
-            // Competitor comparisone');
+            // Competitor comparison
             const competitorPrice = parseFloat(document.getElementById('competitorPrice').value) || 0;
-            diffElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+            
             if (competitorPrice > 0) {
-                const priceDifference = sellingPrice - competitorPrice;t');
+                const priceDifference = sellingPrice - competitorPrice;
                 const priceDifferencePercent = (priceDifference / competitorPrice) * 100;
-                entElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+                
                 const diffElement = document.getElementById('priceDifference');
                 diffElement.textContent = `₱${priceDifference.toFixed(2)}`;
-                diffElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';   document.getElementById('priceDifferencePercent').textContent = 'N/A';
-                   }
-                const percentElement = document.getElementById('priceDifferencePercent');        }
+                diffElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+                
+                const percentElement = document.getElementById('priceDifferencePercent');
                 percentElement.textContent = `${priceDifferencePercent.toFixed(1)}%`;
                 percentElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
             } else {
-                document.getElementById('priceDifference').textContent = 'N/A';t.getElementById('dashboardBody');
-                document.getElementById('priceDifferencePercent').textContent = 'N/A';tbody.innerHTML = '';
+                document.getElementById('priceDifference').textContent = 'N/A';
+                document.getElementById('priceDifferencePercent').textContent = 'N/A';
             }
         }
-const row = document.createElement('tr');
+
         // Update dashboard
-        function updateDashboard() {ent('td');
-            const tbody = document.getElementById('dashboardBody');duct.name;
-            tbody.innerHTML = '';row.appendChild(nameCell);
+        function updateDashboard() {
+            const tbody = document.getElementById('dashboardBody');
+            tbody.innerHTML = '';
             
             productRecipes.forEach(product => {
-                const row = document.createElement('tr');{product.totalCost.toFixed(2)}`;
-                row.appendChild(costCell);
+                const row = document.createElement('tr');
+                
                 const nameCell = document.createElement('td');
                 nameCell.textContent = product.name;
                 row.appendChild(nameCell);
-                {sellingPrice.toFixed(2)}`;
-                const costCell = document.createElement('td');row.appendChild(sellingPriceCell);
+                
+                const costCell = document.createElement('td');
                 costCell.textContent = `₱${product.totalCost.toFixed(2)}`;
                 row.appendChild(costCell);
                 
                 const sellingPrice = product.totalCost * 1.3;
-                const sellingPriceCell = document.createElement('td');t > 0 ? 'profit-positive' : 'profit-negative';
-                sellingPriceCell.textContent = `₱${sellingPrice.toFixed(2)}`;row.appendChild(profitCell);
+                const sellingPriceCell = document.createElement('td');
+                sellingPriceCell.textContent = `₱${sellingPrice.toFixed(2)}`;
                 row.appendChild(sellingPriceCell);
-                 tbody.appendChild(row);
-                const profit = sellingPrice - product.totalCost;   });
-                const profitCell = document.createElement('td');        }
+                
+                const profit = sellingPrice - product.totalCost;
+                const profitCell = document.createElement('td');
                 profitCell.textContent = `₱${profit.toFixed(2)}`;
                 profitCell.className = profit > 0 ? 'profit-positive' : 'profit-negative';
                 row.appendChild(profitCell);
-                const name = document.getElementById('newProductName').value.trim();
+                
                 tbody.appendChild(row);
             });
-        }Please enter a product name');
-   return;
-        // Add new product}
+        }
+
+        // Add new product
         function addNewProduct() {
             const name = document.getElementById('newProductName').value.trim();
             
-            if (!name) {A product with this name already exists');
-                alert('Please enter a product name');   return;
-                return;}
+            if (!name) {
+                alert('Please enter a product name');
+                return;
             }
             
             // Check if product already exists
@@ -781,122 +748,283 @@ const row = document.createElement('tr');
             
             const material1 = document.getElementById('newMaterial1').value;
             const quantity1 = document.getElementById('newQuantity1').value;
-            const material2 = document.getElementById('newMaterial2').value;const quantity5 = document.getElementById('newQuantity5').value;
+            const material2 = document.getElementById('newMaterial2').value;
             const quantity2 = document.getElementById('newQuantity2').value;
-            const material3 = document.getElementById('newMaterial3').value; cost
-            const quantity3 = document.getElementById('newQuantity3').value;let totalCost = 0;
-            const material4 = document.getElementById('newMaterial4').value;
-            const quantity4 = document.getElementById('newQuantity4').value;
-            const material5 = document.getElementById('newMaterial5').value;= materials.find(m => m.name === material1);
-            const quantity5 = document.getElementById('newQuantity5').value;
-               totalCost += material.costPerPiece * parseFloat(quantity1);
-            // Calculate total cost   }
-            let totalCost = 0;}
+            const material3 = document.getElementById('newMaterial3').value;
+            const quantity3 = document.getElementById('newQuantity3').value;
+            
+            // Calculate total cost
+            let totalCost = 0;
             
             if (material1 !== "NONE" && quantity1) {
-                const material = materials.find(m => m.name === material1);= materials.find(m => m.name === material2);
+                const material = materials.find(m => m.name === material1);
                 if (material) {
-                    totalCost += material.costPerPiece * parseFloat(quantity1);   totalCost += material.costPerPiece * parseFloat(quantity2);
-                }   }
-            }}
+                    totalCost += material.costPerPiece * parseFloat(quantity1);
+                }
+            }
             
             if (material2 !== "NONE" && quantity2) {
-                const material = materials.find(m => m.name === material2);= materials.find(m => m.name === material3);
+                const material = materials.find(m => m.name === material2);
                 if (material) {
-                    totalCost += material.costPerPiece * parseFloat(quantity2);   totalCost += material.costPerPiece * parseFloat(quantity3);
-                }   }
-            }}
+                    totalCost += material.costPerPiece * parseFloat(quantity2);
+                }
+            }
             
-            if (material3 !== "NONE" && quantity3) {t
+            if (material3 !== "NONE" && quantity3) {
                 const material = materials.find(m => m.name === material3);
-                if (material) {aterial3],
-                    totalCost += material.costPerPiece * parseFloat(quantity3);y1, quantity2, quantity3],
-                }  totalCost: totalCost
-            }};
+                if (material) {
+                    totalCost += material.costPerPiece * parseFloat(quantity3);
+                }
+            }
             
-            // Create new productproductRecipes.push(newProduct);
+            // Create new product
             const newProduct = {
-                name: name,materials: [material1, material2, material3],
-                quantities: [quantity1, quantity2, quantity3],localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
-                totalCost: totalCost
-            };
+                name: name,
+                materials: [material1, material2, material3],
+                quantities: [quantity1, quantity2, quantity3],
+                    totalCost: totalCost
+                };
             
-            productRecipes.push(newProduct);();
-            updateDashboard();
-            // Save to localStorage
+            // Add product to the list
+            productRecipes.push(newProduct);
+            
+            // Save to local storage
             localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
             
-            // Update UINE';
+            // Update UI
             loadProductOptions();
-            loadProductRecipes();NE';
+            loadProductRecipes();
             updateDashboard();
-            NE';
-            // Clear formdocument.getElementById('newQuantity3').value = '';
+            
+            // Clear the form
             document.getElementById('newProductName').value = '';
-            document.getElementById('newMaterial1').value = 'NONE';   alert('Product added successfully!');
-            document.getElementById('newQuantity1').value = '';        }
+            document.getElementById('newMaterial1').value = 'NONE';
+            document.getElementById('newQuantity1').value = '';
             document.getElementById('newMaterial2').value = 'NONE';
             document.getElementById('newQuantity2').value = '';
             document.getElementById('newMaterial3').value = 'NONE';
-            document.getElementById('newQuantity3').value = '';const name = document.getElementById('newMaterialName').value.trim();
+            document.getElementById('newQuantity3').value = '';
             
             alert('Product added successfully!');
-        }Please enter a material name');
-   return;
-        // Add new material}
+        }
+
+        // Add new material
         function addNewMaterial() {
             const name = document.getElementById('newMaterialName').value.trim();
-            
-            if (!name) {A material with this name already exists');
-                alert('Please enter a material name');   return;
-                return;}
-            }
-            
-            // Check if material already existsconst totalAmount = parseFloat(document.getElementById('newTotalAmount').value) || 0;
-            if (materials.some(m => m.name === name)) {
-                alert('A material with this name already exists');
-                return;Please enter valid quantity and amount values');
-            }   return;
-            }
             const qtyPerPack = parseInt(document.getElementById('newQtyPerPack').value) || 0;
             const totalAmount = parseFloat(document.getElementById('newTotalAmount').value) || 0;
-            const costPerPiece = totalAmount / qtyPerPack;
-            if (qtyPerPack <= 0 || totalAmount <= 0) {
-                alert('Please enter valid quantity and amount values');l
-                return;al = {
+            
+            if (!name || !qtyPerPack || !totalAmount) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Check if material already exists
+            if (materials.some(m => m.name === name)) {
+                alert('A material with this name already exists');
+                return;
             }
             
             // Calculate cost per piece
-            const costPerPiece = totalAmount / qtyPerPack;  costPerPiece: costPerPiece
-            };
+            const costPerPiece = totalAmount / qtyPerPack;
+            
             // Create new material
-            const newMaterial = {materials.push(newMaterial);
+            const newMaterial = {
                 name: name,
                 qtyPerPack: qtyPerPack,
-                totalAmount: totalAmount,localStorage.setItem('materials', JSON.stringify(materials));
+                totalAmount: totalAmount,
                 costPerPiece: costPerPiece
             };
-            );
-            materials.push(newMaterial);loadMaterialOptions();
             
-            // Save to localStoraget(`Successfully imported ${newMaterials.length - 1} materials`);
+            // Add material to the list
+            materials.push(newMaterial);
+            
+            // Save to local storage
             localStorage.setItem('materials', JSON.stringify(materials));
-               alert('No valid data found in the CSV file');
-            // Update UI  }
-            loadMaterialsDatabase();};
+            
+            // Update UI
+            loadMaterialsDatabase();
             loadMaterialOptions();
             
-            alert(`Successfully imported ${newMaterials.length - 1} materials`);  alert('Error reading the CSV file');
-        } else {   };
-            alert('No valid data found in the CSV file');
-        }cript>
-    };
+            // Clear the form
+            document.getElementById('newMaterialName').value = '';
+            document.getElementById('newQtyPerPack').value = '';
+            document.getElementById('newTotalAmount').value = '';
+            
+            alert('Material added successfully!');
+        }
 
+        // Export functions
+        function exportProducts() {
+            const csvContent = 'data:text/csv;charset=utf-8,Name,Material1,Quantity1,Material2,Quantity2,Material3,Quantity3,TotalCost\n' +
+                productRecipes.map(product => {
+                    return `${product.name},${product.materials[0]},${product.quantities[0]},${product.materials[1]},${product.quantities[1]},${product.materials[2]},${product.quantities[2]},${product.totalCost}`;
+                }).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'products.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
+        function exportMaterials() {
+            const csvContent = 'data:text/csv;charset=utf-8,Name,QuantityPerPack,TotalAmount,CostPerPiece\n' +
+                materials.filter(m => m.name !== "NONE").map(material => {
+                    return `${material.name},${material.qtyPerPack},${material.totalAmount},${material.costPerPiece}`;
+                }).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'materials.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
+        // CSV Upload functions
+        function uploadProductsCSV() {
+            const fileInput = document.getElementById('productUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                
+                // Skip header line
+                const newProducts = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    if (lines[i].trim() === '') continue;
+                    
+                    const values = lines[i].split(',');
+                    
+                    if (values.length >= 8) {
+                        const name = values[0].trim();
+                        const material1 = values[1].trim();
+                        const quantity1 = values[2].trim();
+                        const material2 = values[3].trim();
+                        const quantity2 = values[4].trim();
+                        const material3 = values[5].trim();
+                        const quantity3 = values[6].trim();
+                        const totalCost = parseFloat(values[7]) || 0;
+                        
+                        newProducts.push({
+                            name: name,
+                            materials: [material1, material2, material3],
+                            quantities: [quantity1, quantity2, quantity3],
+                            totalCost: totalCost
+                        });
+                    }
+                }
+                
+                if (newProducts.length > 0) {
+                    // Replace or merge with existing products
+                    if (confirm(`Found ${newProducts.length} products. Do you want to replace all existing products? (Click Cancel to merge with existing)`)) {
+                        productRecipes = newProducts;
+                    } else {
+                        // Merge: add only products that don't exist already
+                        for (const newProduct of newProducts) {
+                            if (!productRecipes.some(p => p.name === newProduct.name)) {
+                                productRecipes.push(newProduct);
+                            }
+                        }
+                    }
+                    
+                    // Save to local storage
+                    localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+                    
+                    // Update UI
+                    loadProductOptions();
+                    loadProductRecipes();
+                    updateDashboard();
+                    
+                    alert(`Successfully processed ${newProducts.length} products`);
+                } else {
+                    alert('No valid products found in the file');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
 
-
-
-
-
-</html></body>    </script>        }            };                alert('Error reading the CSV file');            reader.onerror = function() {            </html>
+        function uploadMaterialsCSV() {
+            const fileInput = document.getElementById('materialUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                
+                // Skip header line
+                const newMaterials = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    if (lines[i].trim() === '') continue;
+                    
+                    const values = lines[i].split(',');
+                    
+                    if (values.length >= 4) {
+                        const name = values[0].trim();
+                        const qtyPerPack = parseInt(values[1]) || 0;
+                        const totalAmount = parseFloat(values[2]) || 0;
+                        const costPerPiece = parseFloat(values[3]) || 0;
+                        
+                        newMaterials.push({
+                            name: name,
+                            qtyPerPack: qtyPerPack,
+                            totalAmount: totalAmount,
+                            costPerPiece: costPerPiece
+                        });
+                    }
+                }
+                
+                if (newMaterials.length > 0) {
+                    // Make sure we keep the NONE material
+                    const noneMaterial = materials.find(m => m.name === "NONE");
+                    
+                    // Replace or merge with existing materials
+                    if (confirm(`Found ${newMaterials.length} materials. Do you want to replace all existing materials? (Click Cancel to merge with existing)`)) {
+                        materials = [noneMaterial, ...newMaterials];
+                    } else {
+                        // Merge: add only materials that don't exist already
+                        for (const newMaterial of newMaterials) {
+                            if (!materials.some(m => m.name === newMaterial.name)) {
+                                materials.push(newMaterial);
+                            }
+                        }
+                    }
+                    
+                    // Save to local storage
+                    localStorage.setItem('materials', JSON.stringify(materials));
+                    
+                    // Update UI
+                    loadMaterialsDatabase();
+                    loadMaterialOptions();
+                    
+                    alert(`Successfully processed ${newMaterials.length} materials`);
+                } else {
+                    alert('No valid materials found in the file');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

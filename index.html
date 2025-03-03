@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Material Cost Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .input-row label {
+            min-width: 180px;
+            margin-right: 15px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        select {
+            min-width: 250px;
+        }
+        input[type="number"] {
+            width: 100px;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .highlight {
+            background-color: #e8f4fd;
+        }
+        .input-field {
+            background-color: #fffde7;
+        }
+        .profit-positive {
+            color: green;
+        }
+        .profit-negative {
+            color: red;
+        }
+        .price-lower {
+            color: green;
+        }
+        .price-higher {
+            color: red;
+        }
+        .materials-panel, .profit-panel {
+            flex: 1;
+            min-width: 300px;
+        }
+        .dashboard-panel {
+            width: 100%;
+        }
+        .hidden {
+            display: none;
+        }
+        #navTabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        .admin-panel {
+            margin-top: 20px;
+        }
+        .file-upload {
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .add-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .add-form input, .add-form select {
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Material Cost Calculator</h1>
+    
+    <div id="navTabs">
+        <div class="tab active" onclick="showTab('calculator')">Calculator</div>
+        <div class="tab" onclick="showTab('dashboard')">Dashboard</div>
+        <div class="tab" onclick="showTab('materials')">Materials Database</div>
+        <div class="tab" onclick="showTab('products')">Product Recipes</div>
+        <div class="tab" onclick="showTab('admin')">Admin</div>
+    </div>
+
+    <div id="calculator" class="tab-content">
+        <div class="input-row">
+            <label for="productSelect"><strong>PRODUCT NAME:</strong></label>
+            <select id="productSelect" onchange="updateProductDetails()">
+                <option value="">Select a product</option>
+                <!-- Products will be loaded here -->
+            </select>
+        </div>
+
+        <div class="container">
+            <div class="materials-panel card">
+                <h2>MATERIALS USED</h2>
+                <table id="materialsTable">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsBody">
+                        <!-- Materials will be loaded here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" style="text-align: right;"><strong>TOTAL COST:</strong></td>
+                            <td id="totalCost">₱0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="profit-panel card">
+                <h2>PROFIT ANALYSIS</h2>
+                <div class="input-row">
+                    <label for="profitMargin">PROFIT MARGIN (%):</label>
+                    <input type="number" id="profitMargin" class="input-field" value="30" min="0" max="1000" onchange="updateProfitDetails()">
+                </div>
+                <div class="input-row">
+                    <label>SUGGESTED SELLING PRICE:</label>
+                    <span id="sellingPrice">₱0.00</span>
+                </div>
+                <div class="input-row">
+                    <label>ESTIMATED PROFIT:</label>
+                    <span id="estimatedProfit">₱0.00</span>
+                </div>
+                
+                <h2>BREAKEVEN ANALYSIS</h2>
+                <div class="input-row">
+                    <label for="fixedCosts">FIXED COSTS (₱):</label>
+                    <input type="number" id="fixedCosts" class="input-field" value="500" min="0" onchange="updateProfitDetails()">
+                </div>
+                <div class="input-row">
+                    <label>BREAKEVEN (UNITS):</label>
+                    <span id="breakeven">N/A</span>
+                </div>
+                
+                <h2>COMPETITOR COMPARISON</h2>
+                <div class="input-row">
+                    <label for="competitorPrice">COMPETITOR PRICE (₱):</label>
+                    <input type="number" id="competitorPrice" class="input-field" value="" min="0" onchange="updateProfitDetails()">
+                </div>
+                <div class="input-row">
+                    <label>PRICE DIFFERENCE:</label>
+                    <span id="priceDifference">N/A</span>
+                </div>
+                <div class="input-row">
+                    <label>PRICE DIFFERENCE (%):</label>
+                    <span id="priceDifferencePercent">N/A</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="tab-content hidden">
+        <div class="dashboard-panel card">
+            <h2>Products Overview</h2>
+            <table id="dashboardTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Total Cost</th>
+                        <th>Selling Price (30% margin)</th>
+                        <th>Profit</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardBody">
+                    <!-- Dashboard data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="materials" class="tab-content hidden">
+        <div class="card">
+            <h2>Materials Database</h2>
+            <table id="materialsDatabase">
+                <thead>
+                    <tr>
+                        <th>Material Name</th>
+                        <th>Qty per pack/bundle</th>
+                        <th>Total Amount per pack/bundle</th>
+                        <th>Cost Per Sheet/Piece</th>
+                    </tr>
+                </thead>
+                <tbody id="materialsDatabaseBody">
+                    <!-- Materials database will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="products" class="tab-content hidden">
+        <div class="card">
+            <h2>Product Recipes</h2>
+            <table id="productRecipes">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Material 1</th>
+                        <th>Quantity 1</th>
+                        <th>Material 2</th>
+                        <th>Quantity 2</th>
+                        <th>Material 3</th>
+                        <th>Quantity 3</th>
+                        <th>Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody id="productRecipesBody">
+                    <!-- Product recipes will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="admin" class="tab-content hidden">
+        <div class="card">
+            <h2>Admin Panel</h2>
+            
+            <div class="file-upload">
+                <h3>Upload Products CSV</h3>
+                <p>Upload a CSV file with product data (Format: Name,Material1,Quantity1,Material2,Quantity2,Material3,Quantity3,Material4,Quantity4,Material5,Quantity5)</p>
+                <input type="file" id="productUpload" accept=".csv">
+                <button class="button" onclick="uploadProductsCSV()">Upload Products</button>
+            </div>
+            
+            <div class="file-upload">
+                <h3>Upload Materials CSV</h3>
+                <p>Upload a CSV file with material data (Format: Name,QuantityPerPack,TotalAmount,CostPerPiece)</p>
+                <input type="file" id="materialUpload" accept=".csv">
+                <button class="button" onclick="uploadMaterialsCSV()">Upload Materials</button>
+            </div>
+            
+            <div class="admin-panel">
+                <h3>Add New Product</h3>
+                <div class="add-form">
+                    <div class="form-group">
+                        <label for="newProductName">Product Name:</label>
+                        <input type="text" id="newProductName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newMaterial1">Material 1:</label>
+                        <select id="newMaterial1">
+                            <option value="NONE">-- Select Material --</option>
+                            <!-- Options loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newQuantity1">Quantity 1:</label>
+                        <input type="number" id="newQuantity1" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newMaterial2">Material 2:</label>
+                        <select id="newMaterial2">
+                            <option value="NONE">-- Select Material --</option>
+                            <!-- Options loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newQuantity2">Quantity 2:</label>
+                        <input type="number" id="newQuantity2" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newMaterial3">Material 3:</label>
+                        <select id="newMaterial3">
+                            <option value="NONE">-- Select Material --</option>
+                            <!-- Options loaded dynamically -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newQuantity3">Quantity 3:</label>
+                        <input type="number" id="newQuantity3" step="0.01" min="0">
+                    </div>
+                </div>
+                <button class="button" onclick="addNewProduct()">Add Product</button>
+            </div>
+            
+            <div class="admin-panel">
+                <h3>Add New Material</h3>
+                <div class="add-form">
+                    <div class="form-group">
+                        <label for="newMaterialName">Material Name:</label>
+                        <input type="text" id="newMaterialName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newQtyPerPack">Quantity Per Pack:</label>
+                        <input type="number" id="newQtyPerPack" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="newTotalAmount">Total Amount Per Pack:</label>
+                        <input type="number" id="newTotalAmount" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <button class="button" onclick="addNewMaterial()">Add Material</button>
+            </div>
+            
+            <div class="form-group">
+                <h3>Add New Product</h3>
+                <input type="text" id="newProductName" placeholder="Product Name">
+                
+                <div class="material-selection">
+                    <select id="newMaterial1">
+                        <option value="NONE">Select Material 1</option>
+                    </select>
+                    <input type="number" id="newQuantity1" placeholder="Quantity">
+                </div>
+                
+                <div class="material-selection">
+                    <select id="newMaterial2">
+                        <option value="NONE">Select Material 2</option>
+                    </select>
+                    <input type="number" id="newQuantity2" placeholder="Quantity">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3>Add New Material</h3>
+                <input type="text" id="newMaterialName" placeholder="Material Name">
+                <input type="number" id="newQtyPerPack" placeholder="Quantity Per Pack">
+                <input type="number" id="newTotalAmount" placeholder="Total Amount">utton onclick="exportMaterials()">Export Materials to CSV</button>
+                <button onclick="addNewMaterial()" id="addMaterialBtn">Add Material</button>div>
+            </div>div>
+                </div>
+            <div class="admin-panel">
+                <h3>Export Data</h3>
+                <button class="button" onclick="exportProducts()">Export Products</button>
+                <button class="button" onclick="exportMaterials()">Export Materials</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let materials = [,
+            { name: "NONE", qtyPerPack: 0, totalAmount: 0, costPerPiece: 0 },
+            { name: "QUAFF Photo Paper A4 - 115 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },,
+                { name: "QUAFF Photo Paper A4 - 135 GSM", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
+                { name: "QUAFF Photo Paper A4 - 180 GSM", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+                { name: "QUAFF Photo Paper A4 - 200 GSM", qtyPerPack: 100, totalAmount: 460, costPerPiece: 4.6 },
+                { name: "QUAFF Photo Paper A4 - 230 GSM", qtyPerPack: 100, totalAmount: 480, costPerPiece: 4.8 },
+                { name: "SnowWhite Board", qtyPerPack: 100, totalAmount: 800, costPerPiece: 8 },
+                { name: "Generic Sticker Paper - White Glossy", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+                { name: "Generic Sticker Paper - White Matte", qtyPerPack: 100, totalAmount: 450, costPerPiece: 4.5 },
+                { name: "Generic Sticker Paper - Clear Glossy", qtyPerPack: 100, totalAmount: 550, costPerPiece: 5.5 }
+            ];
+            { name: "Generic Sticker Paper - Clear Matte", qtyPerPack: 100, totalAmount: 550, costPerPiece: 5.5 },
+            { name: "KIMLON Hard Card 180g", qtyPerPack: 100, totalAmount: 350, costPerPiece: 3.5 },
+            { name: "KIMLON Hard Card 220g", qtyPerPack: 100, totalAmount: 380, costPerPiece: 3.8 },
+            { name: "SnowWhite Board", qtyPerPack: 100, totalAmount: 800, costPerPiece: 8 }
+        ];
+
+        let productRecipes = [
+            { 
+                name: "4R Photo Print",
+                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["0.25", "", "", "", ""],
+                totalCost: 1.15
+            },
+            { 
+                name: "A4 Photo Print - 200 GSM",
+                materials: ["QUAFF Photo Paper A4 - 200 GSM", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["1", "", "", "", ""],
+                totalCost: 4.6
+            },
+            { 
+                name: "A4 Certificate Print",
+                materials: ["QUAFF Photo Paper A4 - 230 GSM", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["1", "", "", "", ""],
+                totalCost: 4.8
+            },
+            { 
+                name: "Business Card",
+                materials: ["KIMLON Hard Card 220g", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["0.1", "", "", "", ""],
+                totalCost: 0.38
+            },
+            { 
+                name: "Sticker - White Glossy",
+                materials: ["Generic Sticker Paper - White Glossy", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["1", "", "", "", ""],
+                totalCost: 4.5
+            },
+            { 
+                name: "Sticker - White Matte",
+                materials: ["Generic Sticker Paper - White Matte", "NONE", "NONE", "NONE", "NONE"],
+                quantities: ["1", "", "", "", ""],
+                totalCost: 4.5
+            }
+        ];
+loadMaterialOptions();
+        // Initialize the app
+        window.onload = function() {t exist yet
+            loadProductOptions();
+            loadMaterialsDatabase();lStorage.setItem('materials', JSON.stringify(materials));
+            loadProductRecipes();
+            updateDashboard();   materials = JSON.parse(localStorage.getItem('materials'));
+            loadMaterialOptions();}
+            
+            // Save data to localStorage if it doesn't exist yet
+            if (!localStorage.getItem('materials')) {lStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+                localStorage.setItem('materials', JSON.stringify(materials));
+            } else {   productRecipes = JSON.parse(localStorage.getItem('productRecipes'));
+                materials = JSON.parse(localStorage.getItem('materials'));  }
+            }        };
+            
+            if (!localStorage.getItem('productRecipes')) {
+                localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+            } else {
+                productRecipes = JSON.parse(localStorage.getItem('productRecipes'));content').forEach(tab => {
+            } tab.classList.add('hidden');
+        };});
+
+        // Navigation functions
+        function showTab(tabId) {document.getElementById(tabId).classList.remove('hidden');
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');orEach(tab => {
+            }); tab.classList.remove('active');
+            });
+            // Show the selected tab
+            document.getElementById(tabId).classList.remove('hidden');e
+            
+            // Update tab styling).includes(tabId.toLowerCase())) {
+            document.querySelectorAll('.tab').forEach(tab => {   tab.classList.add('active');
+                tab.classList.remove('active'); }
+            });   });
+                    }
+            // Find the tab that was clicked and make it active
+            document.querySelectorAll('.tab').forEach(tab => {down
+                if (tab.textContent.toLowerCase().includes(tabId.toLowerCase())) {
+                    tab.classList.add('active');
+                }select.innerHTML = '<option value="">Select a product</option>';
+            });
+        }
+teElement('option');
+        // Load product options in dropdown
+        function loadProductOptions() {t.name;
+            const select = document.getElementById('productSelect'); select.appendChild(option);
+            select.innerHTML = '<option value="">Select a product</option>';   });
+                    }
+            productRecipes.forEach(product => {
+                const option = document.createElement('option');duct creation
+                option.value = product.name;) {
+                option.textContent = product.name;
+                select.appendChild(option);
+            });
+        }
+,
+        // Load material options for product creation  document.getElementById('newMaterial5')
+        function loadMaterialOptions() {];
+            const materialSelects = [
+                document.getElementById('newMaterial1'),
+                document.getElementById('newMaterial2'),select.innerHTML = '<option value="NONE">-- Select Material --</option>';
+                document.getElementById('newMaterial3'),
+                document.getElementById('newMaterial4'),
+                document.getElementById('newMaterial5')
+            ];eElement('option');
+            
+            materialSelects.forEach(select => {al.name;
+                select.innerHTML = '<option value="NONE">-- Select Material --</option>';   select.appendChild(option);
+                 }
+                materials.forEach(material => { });
+                    if (material.name !== "NONE") {   });
+                        const option = document.createElement('option');        }
+                        option.value = material.name;
+                        option.textContent = material.name;
+                        select.appendChild(option);
+                    }t.getElementById('materialsDatabaseBody');
+                });tbody.innerHTML = '';
+            });
+        }
+
+        // Load materials databaseconst row = document.createElement('tr');
+        function loadMaterialsDatabase() {
+            const tbody = document.getElementById('materialsDatabaseBody');nt('td');
+            tbody.innerHTML = '';erial.name;
+            row.appendChild(nameCell);
+            materials.forEach(material => {
+                if (material.name !== "NONE") {');
+                    const row = document.createElement('tr');erial.qtyPerPack;
+                    row.appendChild(qtyCell);
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = material.name;
+                    row.appendChild(nameCell);{material.totalAmount.toFixed(2)}`;
+                    row.appendChild(amountCell);
+                    const qtyCell = document.createElement('td');
+                    qtyCell.textContent = material.qtyPerPack;
+                    row.appendChild(qtyCell);{material.costPerPiece.toFixed(2)}`;
+                    row.appendChild(costCell);
+                    const amountCell = document.createElement('td');
+                    amountCell.textContent = `₱${material.totalAmount.toFixed(2)}`;   tbody.appendChild(row);
+                    row.appendChild(amountCell); }
+                       });
+                    const costCell = document.createElement('td');        }
+                    costCell.textContent = `₱${material.costPerPiece.toFixed(2)}`;
+                    row.appendChild(costCell);
+                    
+                    tbody.appendChild(row);t.getElementById('productRecipesBody');
+                }tbody.innerHTML = '';
+            });
+        }
+const row = document.createElement('tr');
+        // Load product recipes
+        function loadProductRecipes() {ent('td');
+            const tbody = document.getElementById('productRecipesBody');duct.name;
+            tbody.innerHTML = '';row.appendChild(nameCell);
+            
+            productRecipes.forEach(product => {quantities (simplified from the Excel version)
+                const row = document.createElement('tr');
+                
+                const nameCell = document.createElement('td');duct.materials[i] !== "NONE" ? product.materials[i] : "";
+                nameCell.textContent = product.name;row.appendChild(materialCell);
+                row.appendChild(nameCell);
+                ;
+                // Add up to 3 materials and quantities (simplified from the Excel version)duct.quantities[i];
+                for (let i = 0; i < 3; i++) {   row.appendChild(quantityCell);
+                    const materialCell = document.createElement('td');}
+                    materialCell.textContent = product.materials[i] !== "NONE" ? product.materials[i] : "";
+                    row.appendChild(materialCell);
+                    {product.totalCost.toFixed(2)}`;
+                    const quantityCell = document.createElement('td');row.appendChild(costCell);
+                    quantityCell.textContent = product.quantities[i];
+                    row.appendChild(quantityCell); tbody.appendChild(row);
+                }   });
+                        }
+                const costCell = document.createElement('td');
+                costCell.textContent = `₱${product.totalCost.toFixed(2)}`;lection changes
+                row.appendChild(costCell);
+                e;
+                tbody.appendChild(row);const product = productRecipes.find(p => p.name === productName);
+            });
+        }
+
+        // Update product details when selection changesrofitDetails();
+        function updateProductDetails() {   return;
+            const productName = document.getElementById('productSelect').value;}
+            const product = productRecipes.find(p => p.name === productName);
+            
+            if (!product) {t.getElementById('materialsBody');
+                clearMaterialsTable();tbody.innerHTML = '';
+                updateProfitDetails();
+                return;let totalCost = 0;
+            }
+            
+            // Update materials table
+            const tbody = document.getElementById('materialsBody');const material = materials.find(m => m.name === product.materials[i]);
+            tbody.innerHTML = '';
+            
+            let totalCost = 0;const row = document.createElement('tr');
+            
+            for (let i = 0; i < product.materials.length; i++) {nt('td');
+                if (product.materials[i] !== "NONE" && product.materials[i] !== "") {erial.name;
+                    const material = materials.find(m => m.name === product.materials[i]);row.appendChild(nameCell);
+                    
+                    if (material) {;
+                        const row = document.createElement('tr');duct.quantities[i];
+                        row.appendChild(quantityCell);
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = material.name;
+                        row.appendChild(nameCell); || 0;
+                        y * material.costPerPiece;
+                        const quantityCell = document.createElement('td');totalCost += itemCost;
+                        quantityCell.textContent = product.quantities[i];
+                        row.appendChild(quantityCell);
+                        {itemCost.toFixed(2)}`;
+                        // Calculate costrow.appendChild(costCell);
+                        let quantity = parseFloat(product.quantities[i]) || 0;
+                        let itemCost = quantity * material.costPerPiece;   tbody.appendChild(row);
+                        totalCost += itemCost;   }
+                           }
+                        const costCell = document.createElement('td');}
+                        costCell.textContent = `₱${itemCost.toFixed(2)}`;
+                        row.appendChild(costCell);
+                        document.getElementById('totalCost').textContent = `₱${totalCost.toFixed(2)}`;
+                        tbody.appendChild(row);
+                    }ls
+                }   updateProfitDetails();
+            }        }
+            
+            // Update total cost
+            document.getElementById('totalCost').textContent = `₱${totalCost.toFixed(2)}`;
+            
+            // Update profit details   document.getElementById('totalCost').textContent = '₱0.00';
+            updateProfitDetails();        }
+        }
+
+        // Clear materials table
+        function clearMaterialsTable() {tent;
+            document.getElementById('materialsBody').innerHTML = '';const totalCost = parseFloat(totalCostText.replace('₱', '')) || 0;
+            document.getElementById('totalCost').textContent = '₱0.00';
+        }rofitMargin').value) || 0;
+n / 100);
+        // Update profit detailsconst estimatedProfit = sellingPrice - totalCost;
+        function updateProfitDetails() {
+            const totalCostText = document.getElementById('totalCost').textContent;document.getElementById('sellingPrice').textContent = `₱${sellingPrice.toFixed(2)}`;
+            const totalCost = parseFloat(totalCostText.replace('₱', '')) || 0;
+            t');
+            const profitMargin = parseFloat(document.getElementById('profitMargin').value) || 0;
+            const sellingPrice = totalCost * (1 + profitMargin / 100);profitElement.className = estimatedProfit > 0 ? 'profit-positive' : 'profit-negative';
+            const estimatedProfit = sellingPrice - totalCost;
+            
+            document.getElementById('sellingPrice').textContent = `₱${sellingPrice.toFixed(2)}`;
+            / estimatedProfit) : 'N/A';
+            const profitElement = document.getElementById('estimatedProfit');document.getElementById('breakeven').textContent = breakeven;
+            profitElement.textContent = `₱${estimatedProfit.toFixed(2)}`;
+            profitElement.className = estimatedProfit > 0 ? 'profit-positive' : 'profit-negative';
+            const competitorPrice = parseFloat(document.getElementById('competitorPrice').value) || 0;
+            // Breakeven analysis
+            const fixedCosts = parseFloat(document.getElementById('fixedCosts').value) || 0;
+            const breakeven = estimatedProfit > 0 ? Math.ceil(fixedCosts / estimatedProfit) : 'N/A';
+            document.getElementById('breakeven').textContent = breakeven;const priceDifferencePercent = (priceDifference / competitorPrice) * 100;
+            
+            // Competitor comparisone');
+            const competitorPrice = parseFloat(document.getElementById('competitorPrice').value) || 0;
+            diffElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+            if (competitorPrice > 0) {
+                const priceDifference = sellingPrice - competitorPrice;t');
+                const priceDifferencePercent = (priceDifference / competitorPrice) * 100;
+                entElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+                const diffElement = document.getElementById('priceDifference');
+                diffElement.textContent = `₱${priceDifference.toFixed(2)}`;
+                diffElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';   document.getElementById('priceDifferencePercent').textContent = 'N/A';
+                   }
+                const percentElement = document.getElementById('priceDifferencePercent');        }
+                percentElement.textContent = `${priceDifferencePercent.toFixed(1)}%`;
+                percentElement.className = priceDifference < 0 ? 'price-lower' : 'price-higher';
+            } else {
+                document.getElementById('priceDifference').textContent = 'N/A';t.getElementById('dashboardBody');
+                document.getElementById('priceDifferencePercent').textContent = 'N/A';tbody.innerHTML = '';
+            }
+        }
+const row = document.createElement('tr');
+        // Update dashboard
+        function updateDashboard() {ent('td');
+            const tbody = document.getElementById('dashboardBody');duct.name;
+            tbody.innerHTML = '';row.appendChild(nameCell);
+            
+            productRecipes.forEach(product => {
+                const row = document.createElement('tr');{product.totalCost.toFixed(2)}`;
+                row.appendChild(costCell);
+                const nameCell = document.createElement('td');
+                nameCell.textContent = product.name;
+                row.appendChild(nameCell);
+                {sellingPrice.toFixed(2)}`;
+                const costCell = document.createElement('td');row.appendChild(sellingPriceCell);
+                costCell.textContent = `₱${product.totalCost.toFixed(2)}`;
+                row.appendChild(costCell);
+                
+                const sellingPrice = product.totalCost * 1.3;
+                const sellingPriceCell = document.createElement('td');t > 0 ? 'profit-positive' : 'profit-negative';
+                sellingPriceCell.textContent = `₱${sellingPrice.toFixed(2)}`;row.appendChild(profitCell);
+                row.appendChild(sellingPriceCell);
+                 tbody.appendChild(row);
+                const profit = sellingPrice - product.totalCost;   });
+                const profitCell = document.createElement('td');        }
+                profitCell.textContent = `₱${profit.toFixed(2)}`;
+                profitCell.className = profit > 0 ? 'profit-positive' : 'profit-negative';
+                row.appendChild(profitCell);
+                const name = document.getElementById('newProductName').value.trim();
+                tbody.appendChild(row);
+            });
+        }Please enter a product name');
+   return;
+        // Add new product}
+        function addNewProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            
+            if (!name) {A product with this name already exists');
+                alert('Please enter a product name');   return;
+                return;}
+            }
+            
+            // Check if product already exists
+            if (productRecipes.some(p => p.name === name)) {
+                alert('A product with this name already exists');
+                return;
+            }
+            
+            const material1 = document.getElementById('newMaterial1').value;
+            const quantity1 = document.getElementById('newQuantity1').value;
+            const material2 = document.getElementById('newMaterial2').value;const quantity5 = document.getElementById('newQuantity5').value;
+            const quantity2 = document.getElementById('newQuantity2').value;
+            const material3 = document.getElementById('newMaterial3').value; cost
+            const quantity3 = document.getElementById('newQuantity3').value;let totalCost = 0;
+            const material4 = document.getElementById('newMaterial4').value;
+            const quantity4 = document.getElementById('newQuantity4').value;
+            const material5 = document.getElementById('newMaterial5').value;= materials.find(m => m.name === material1);
+            const quantity5 = document.getElementById('newQuantity5').value;
+               totalCost += material.costPerPiece * parseFloat(quantity1);
+            // Calculate total cost   }
+            let totalCost = 0;}
+            
+            if (material1 !== "NONE" && quantity1) {
+                const material = materials.find(m => m.name === material1);= materials.find(m => m.name === material2);
+                if (material) {
+                    totalCost += material.costPerPiece * parseFloat(quantity1);   totalCost += material.costPerPiece * parseFloat(quantity2);
+                }   }
+            }}
+            
+            if (material2 !== "NONE" && quantity2) {
+                const material = materials.find(m => m.name === material2);= materials.find(m => m.name === material3);
+                if (material) {
+                    totalCost += material.costPerPiece * parseFloat(quantity2);   totalCost += material.costPerPiece * parseFloat(quantity3);
+                }   }
+            }}
+            
+            if (material3 !== "NONE" && quantity3) {t
+                const material = materials.find(m => m.name === material3);
+                if (material) {aterial3],
+                    totalCost += material.costPerPiece * parseFloat(quantity3);y1, quantity2, quantity3],
+                }  totalCost: totalCost
+            }};
+            
+            // Create new productproductRecipes.push(newProduct);
+            const newProduct = {
+                name: name,materials: [material1, material2, material3],
+                quantities: [quantity1, quantity2, quantity3],localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+                totalCost: totalCost
+            };
+            
+            productRecipes.push(newProduct);();
+            updateDashboard();
+            // Save to localStorage
+            localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+            
+            // Update UINE';
+            loadProductOptions();
+            loadProductRecipes();NE';
+            updateDashboard();
+            NE';
+            // Clear formdocument.getElementById('newQuantity3').value = '';
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newMaterial1').value = 'NONE';   alert('Product added successfully!');
+            document.getElementById('newQuantity1').value = '';        }
+            document.getElementById('newMaterial2').value = 'NONE';
+            document.getElementById('newQuantity2').value = '';
+            document.getElementById('newMaterial3').value = 'NONE';
+            document.getElementById('newQuantity3').value = '';const name = document.getElementById('newMaterialName').value.trim();
+            
+            alert('Product added successfully!');
+        }Please enter a material name');
+   return;
+        // Add new material}
+        function addNewMaterial() {
+            const name = document.getElementById('newMaterialName').value.trim();
+            
+            if (!name) {A material with this name already exists');
+                alert('Please enter a material name');   return;
+                return;}
+            }
+            
+            // Check if material already existsconst totalAmount = parseFloat(document.getElementById('newTotalAmount').value) || 0;
+            if (materials.some(m => m.name === name)) {
+                alert('A material with this name already exists');
+                return;Please enter valid quantity and amount values');
+            }   return;
+            }
+            const qtyPerPack = parseInt(document.getElementById('newQtyPerPack').value) || 0;
+            const totalAmount = parseFloat(document.getElementById('newTotalAmount').value) || 0;
+            const costPerPiece = totalAmount / qtyPerPack;
+            if (qtyPerPack <= 0 || totalAmount <= 0) {
+                alert('Please enter valid quantity and amount values');l
+                return;al = {
+            }
+            
+            // Calculate cost per piece
+            const costPerPiece = totalAmount / qtyPerPack;  costPerPiece: costPerPiece
+            };
+            // Create new material
+            const newMaterial = {materials.push(newMaterial);
+                name: name,
+                qtyPerPack: qtyPerPack,
+                totalAmount: totalAmount,localStorage.setItem('materials', JSON.stringify(materials));
+                costPerPiece: costPerPiece
+            };
+            );
+            materials.push(newMaterial);loadMaterialOptions();
+            
+            // Save to localStoraget(`Successfully imported ${newMaterials.length - 1} materials`);
+            localStorage.setItem('materials', JSON.stringify(materials));
+               alert('No valid data found in the CSV file');
+            // Update UI  }
+            loadMaterialsDatabase();};
+            loadMaterialOptions();
+            
+            alert(`Successfully imported ${newMaterials.length - 1} materials`);  alert('Error reading the CSV file');
+        } else {   };
+            alert('No valid data found in the CSV file');
+        }cript>
+    };
+
+
+
+
+
+
+
+
+</html></body>    </script>        }            };                alert('Error reading the CSV file');            reader.onerror = function() {            </html>

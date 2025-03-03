@@ -248,7 +248,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="2" style="text-align: right;"><strong>TOTAL COST:</strong></td>
+                            <td colspan="2" style="text-align: right;"><strong>Material Total Cost:</strong></td>
                             <td id="totalCost">₱0.00</td>
                         </tr>
                         <tr>
@@ -262,6 +262,10 @@
                         <tr>
                             <td colspan="2" style="text-align: right;"><strong>Waste Ink (5%):</strong></td>
                             <td id="wasteInkCost">₱0.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;"><strong>Total Cost:</strong></td>
+                            <td id="finalTotalCost">₱0.00</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -906,6 +910,7 @@ function showTab(tabId) {
     const inkCostSpan = document.getElementById('inkCost');
     const bufferCostSpan = document.getElementById('bufferCost');
     const wasteInkCostSpan = document.getElementById('wasteInkCost');
+    const finalTotalCostSpan = document.getElementById('finalTotalCost');
     
     materialsBody.innerHTML = '';
     
@@ -945,13 +950,15 @@ function showTab(tabId) {
             totalCostSpan.textContent = `₱${totalCost.toFixed(2)}`;
             
             // Calculate additional costs
-            const inkCost = totalCost * 0.15;
-            const bufferCost = totalCost * 0.10;
-            const wasteInkCost = totalCost * 0.10;
+            const inkCost = totalCost * 0.03;
+            const bufferCost = totalCost * 0.05;
+            const wasteInkCost = totalCost * 0.05;
+            const finalTotalCost = totalCost + inkCost + bufferCost + wasteInkCost;
             
             inkCostSpan.textContent = `₱${inkCost.toFixed(2)}`;
             bufferCostSpan.textContent = `₱${bufferCost.toFixed(2)}`;
             wasteInkCostSpan.textContent = `₱${wasteInkCost.toFixed(2)}`;
+            finalTotalCostSpan.textContent = `₱${finalTotalCost.toFixed(2)}`;
             
             updateProfitDetails();
         }
@@ -960,13 +967,14 @@ function showTab(tabId) {
         inkCostSpan.textContent = '₱0.00';
         bufferCostSpan.textContent = '₱0.00';
         wasteInkCostSpan.textContent = '₱0.00';
+        finalTotalCostSpan.textContent = '₱0.00';
         updateProfitDetails();
     }
 }
 
         // Update profit and pricing details details
         function updateProfitDetails() {
-            const totalCostText = document.getElementById('totalCost').textContent;
+            const totalCostText = document.getElementById('finalTotalCost').textContent;
             const totalCost = parseFloat(totalCostText.replace('₱', ''));
             const profitMargin = parseFloat(document.getElementById('profitMargin').value) / 100;
             const fixedCosts = parseFloat(document.getElementById('fixedCosts').value);

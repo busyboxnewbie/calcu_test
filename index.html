@@ -251,6 +251,18 @@
                             <td colspan="2" style="text-align: right;"><strong>TOTAL COST:</strong></td>
                             <td id="totalCost">₱0.00</td>
                         </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;"><strong>Ink Cost (15%):</strong></td>
+                            <td id="inkCost">₱0.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;"><strong>Buffer/Lost/Reject/Damage (10%):</strong></td>
+                            <td id="bufferCost">₱0.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;"><strong>Waste Ink (10%):</strong></td>
+                            <td id="wasteInkCost">₱0.00</td>
+                        </tr>
                     </tfoot>
                 </table>
             </div>
@@ -658,7 +670,31 @@
         // Global variables for editing
         let currentEditIndex = -1;
 
-        // Initialize the app
+        // Add this function to the top of your script to ensure tab buttons work correctly
+        function setupTabNavigation() {
+            // Get all tab buttons and add click event listeners
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Map tab text to tab content IDs
+                    const tabTextToId = {
+                        'Calculator': 'calculator',
+                        'Dashboard': 'dashboard',
+                        'Materials Database': 'materials',
+                        'Product Recipes': 'products',
+                        'Admin': 'admin'
+                    };
+                    
+                    const tabText = this.textContent.trim();
+                    const tabId = tabTextToId[tabText];
+                    
+                    if (tabId) {
+                        showTab(tabId);
+                    }
+                });
+            });
+        }
+
+        // Modify the window.onload function to include setup for tab navigation
         window.onload = function() {
             // Load data from local storage if it exists
             if (localStorage.getItem('materials')) {
@@ -676,6 +712,12 @@
                 }
             });
             
+            // Set up tab navigation
+            setupTabNavigation();
+            
+            // Show calculator tab by default
+            showTab('calculator');
+            
             loadProductOptions();
             loadMaterialsDatabase();
             loadProductRecipes();
@@ -684,27 +726,34 @@
         };
 
         // Navigation functions
-        function showTab(tabId) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            
-            // Show the selected tab
-            document.getElementById(tabId).classList.remove('hidden');
-            
-            // Update tab styling
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Find the tab that was clicked and make it active
-            document.querySelectorAll('.tab').forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(tabId.toLowerCase())) {
-                    tab.classList.add('active');
-                }
-            });
+function showTab(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Show the selected tab
+    document.getElementById(tabId).classList.remove('hidden');
+    
+    // Update tab styling
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Find the tab that corresponds to the tabId and make it active
+    const tabMap = {
+        'dashboardTab': 'Dashboard',
+        'materialsTab': 'Materials Database',
+        'productRecipesTab': 'Product Recipes',
+        'adminTab': 'Admin'
+    };
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+        if (tab.textContent.trim() === tabMap[tabId]) {
+            tab.classList.add('active');
         }
+    });
+}
 
         // Load product options in dropdown
         function loadProductOptions() {
@@ -781,8 +830,26 @@
                     actionButtons.className = 'action-buttons';
                     
                     const editButton = document.createElement('button');
-                    edit
-                    // Load product recipes
+                    editButton.className = 'button edit-button';
+                    editButton.textContent = 'Edit';
+                    editButton.onclick = function() { openEditMaterialModal(index); };
+                    actionButtons.appendChild(editButton);
+                    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'button delete-button';
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function() { deleteMaterial(index); };
+                    actionButtons.appendChild(deleteButton);
+                    
+                    actionsCell.appendChild(actionButtons);
+                    row.appendChild(actionsCell);
+                    
+                    tbody.appendChild(row);
+                }
+            });
+        }
+
+        // Load product recipes
         function loadProductRecipes() {
             const tbody = document.getElementById('productRecipesBody');
             tbody.innerHTML = '';
@@ -804,7 +871,7 @@
                     quantityCell.textContent = product.quantities[i] || "";
                     row.appendChild(quantityCell);
                 }
-                
+                 
                 const costCell = document.createElement('td');
                 costCell.textContent = `₱${product.totalCost.toFixed(2)}`;
                 row.appendChild(costCell);
@@ -812,7 +879,7 @@
                 // Add action buttons
                 const actionsCell = document.createElement('td');
                 actionsCell.className = 'action-buttons';
-                
+                    
                 const editButton = document.createElement('button');
                 editButton.className = 'button edit-button';
                 editButton.textContent = 'Edit';
@@ -833,57 +900,71 @@
 
         // Update product details
         function updateProductDetails() {
-            const productName = document.getElementById('productSelect').value;
-            const materialsBody = document.getElementById('materialsBody');
-            const totalCostSpan = document.getElementById('totalCost');
+    const productName = document.getElementById('productSelect').value;
+    const materialsBody = document.getElementById('materialsBody');
+    const totalCostSpan = document.getElementById('totalCost');
+    const inkCostSpan = document.getElementById('inkCost');
+    const bufferCostSpan = document.getElementById('bufferCost');
+    const wasteInkCostSpan = document.getElementById('wasteInkCost');
+    
+    materialsBody.innerHTML = '';
+    
+    if (productName) {
+        const product = productRecipes.find(p => p.name === productName);
+        
+        if (product) {
+            let totalCost = 0;
             
-            materialsBody.innerHTML = '';
-            
-            if (productName) {
-                const product = productRecipes.find(p => p.name === productName);
-                
-                if (product) {
-                    let totalCost = 0;
-                    
-                    // Add materials to the table
-                    for (let i = 0; i < 5; i++) {
-                        if (product.materials[i] && product.materials[i] !== "NONE" && product.quantities[i]) {
-                            const material = materials.find(m => m.name === product.materials[i]);
-                            
-                            if (material) {
-                                const quantity = parseFloat(product.quantities[i]);
-                                const cost = material.costPerPiece * quantity;
-                                totalCost += cost;
-                                
-                                const row = document.createElement('tr');
-                                
-                                const materialCell = document.createElement('td');
-                                materialCell.textContent = material.name;
-                                row.appendChild(materialCell);
-                                
-                                const quantityCell = document.createElement('td');
-                                quantityCell.textContent = quantity;
-                                row.appendChild(quantityCell);
-                                
-                                const costCell = document.createElement('td');
-                                costCell.textContent = `₱${cost.toFixed(2)}`;
-                                row.appendChild(costCell);
-                                
-                                materialsBody.appendChild(row);
-                            }
-                        }
+            // Add materials to the table
+            for (let i = 0; i < 5; i++) {
+                if (product.materials[i] && product.materials[i] !== "NONE" && product.quantities[i]) {
+                    const material = materials.find(m => m.name === product.materials[i]);
+                    if (material) {
+                        const quantity = parseFloat(product.quantities[i]);
+                        const cost = material.costPerPiece * quantity;
+                        totalCost += cost;
+                        
+                        const row = document.createElement('tr');
+                        const materialCell = document.createElement('td');
+                        materialCell.textContent = material.name;
+                        row.appendChild(materialCell);
+                        
+                        const quantityCell = document.createElement('td');
+                        quantityCell.textContent = quantity;
+                        row.appendChild(quantityCell);
+                        
+                        const costCell = document.createElement('td');
+                        costCell.textContent = `₱${cost.toFixed(2)}`;
+                        row.appendChild(costCell);
+                        
+                        materialsBody.appendChild(row);
                     }
-                    
-                    totalCostSpan.textContent = `₱${totalCost.toFixed(2)}`;
-                    updateProfitDetails();
                 }
-            } else {
-                totalCostSpan.textContent = '₱0.00';
-                updateProfitDetails();
             }
+            
+            totalCostSpan.textContent = `₱${totalCost.toFixed(2)}`;
+            
+            // Calculate additional costs
+            const inkCost = totalCost * 0.15;
+            const bufferCost = totalCost * 0.10;
+            const wasteInkCost = totalCost * 0.10;
+            
+            inkCostSpan.textContent = `₱${inkCost.toFixed(2)}`;
+            bufferCostSpan.textContent = `₱${bufferCost.toFixed(2)}`;
+            wasteInkCostSpan.textContent = `₱${wasteInkCost.toFixed(2)}`;
+            
+            updateProfitDetails();
         }
+    } else {
+        totalCostSpan.textContent = '₱0.00';
+        inkCostSpan.textContent = '₱0.00';
+        bufferCostSpan.textContent = '₱0.00';
+        wasteInkCostSpan.textContent = '₱0.00';
+        updateProfitDetails();
+    }
+}
 
-        // Update profit and pricing details
+        // Update profit and pricing details details
         function updateProfitDetails() {
             const totalCostText = document.getElementById('totalCost').textContent;
             const totalCost = parseFloat(totalCostText.replace('₱', ''));
@@ -900,11 +981,9 @@
             
             // Update UI
             document.getElementById('sellingPrice').textContent = `₱${sellingPrice.toFixed(2)}`;
-            
             const estimatedProfitSpan = document.getElementById('estimatedProfit');
             estimatedProfitSpan.textContent = `₱${profit.toFixed(2)}`;
             estimatedProfitSpan.className = profit > 0 ? 'profit-positive' : 'profit-negative';
-            
             document.getElementById('breakeven').textContent = !isNaN(breakeven) && isFinite(breakeven) ? Math.ceil(breakeven) : 'N/A';
             
             // Competitor comparison
@@ -914,10 +993,8 @@
             if (competitorPrice !== null && !isNaN(competitorPrice)) {
                 const difference = sellingPrice - competitorPrice;
                 const differencePercent = (difference / competitorPrice) * 100;
-                
                 priceDifferenceSpan.textContent = `₱${difference.toFixed(2)}`;
                 priceDifferenceSpan.className = difference < 0 ? 'price-lower' : 'price-higher';
-                
                 priceDifferencePercentSpan.textContent = `${differencePercent.toFixed(2)}%`;
                 priceDifferencePercentSpan.className = difference < 0 ? 'price-lower' : 'price-higher';
             } else {
@@ -976,7 +1053,7 @@
             let totalCost = 0;
             
             for (let i = 1; i <= 5; i++) {
-                const materialName = document.getElementById(`newMaterial${i}`).value;
+                const materialName = document.getElementById(`newMaterial${i}`).value;    
                 const quantity = document.getElementById(`newQuantity${i}`).value;
                 
                 materials.push(materialName);
@@ -1062,10 +1139,8 @@
         // Edit product modal
         function openEditProductModal(index) {
             const product = productRecipes[index];
-            
             document.getElementById('editProductName').value = product.name;
             document.getElementById('editProductIndex').value = index;
-            
             for (let i = 1; i <= 5; i++) {
                 document.getElementById(`editMaterial${i}`).value = product.materials[i-1] || "NONE";
                 document.getElementById(`editQuantity${i}`).value = product.quantities[i-1] || "";
@@ -1077,7 +1152,6 @@
         // Edit material modal
         function openEditMaterialModal(index) {
             const material = materials[index];
-            
             document.getElementById('editMaterialName').value = material.name;
             document.getElementById('editMaterialIndex').value = index;
             document.getElementById('editQtyPerPack').value = material.qtyPerPack;
@@ -1107,7 +1181,7 @@
             let totalCost = 0;
             
             for (let i = 1; i <= 5; i++) {
-                const materialName = document.getElementById(`editMaterial${i}`).value;
+                const materialName = document.getElementById(`editMaterial${i}`).value;    
                 const quantity = document.getElementById(`editQuantity${i}`).value;
                 
                 materials.push(materialName);
@@ -1175,6 +1249,8 @@
             
             // Need to update all products that use this material
             recalculateProductCosts();
+            loadProductRecipes();
+            updateDashboard();
             
             // Close modal
             closeModal('editMaterialModal');
@@ -1250,7 +1326,6 @@
         function recalculateProductCosts() {
             productRecipes.forEach(product => {
                 let totalCost = 0;
-                
                 for (let i = 0; i < product.materials.length; i++) {
                     if (product.materials[i] !== "NONE" && product.quantities[i]) {
                         const material = materials.find(m => m.name === product.materials[i]);
@@ -1259,7 +1334,6 @@
                         }
                     }
                 }
-                
                 product.totalCost = totalCost;
             });
             
@@ -1297,7 +1371,7 @@
                                 columns[3].trim() || "NONE",
                                 columns[5].trim() || "NONE",
                                 columns[7].trim() || "NONE",
-                                columns[9].trim() || "NONE"
+                                columns[9].trim() || "NONE",
                             ];
                             const quantities = [
                                 columns[2].trim() || "",
@@ -1318,47 +1392,37 @@
                                     }
                                 }
                             }
-                            
-                            // Create new product
                             const newProduct = {
                                 name: name,
                                 materials: materials,
                                 quantities: quantities,
                                 totalCost: totalCost
                             };
-                            
-                            // Check if product already exists
                             const existingIndex = productRecipes.findIndex(p => p.name === name);
-                            
                             if (existingIndex >= 0) {
                                 productRecipes[existingIndex] = newProduct;
                             } else {
                                 productRecipes.push(newProduct);
                             }
-                        }
-                    }
+                            localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+                            
+                            // Check if product already exists// Update UI
+                                productRecipes.push(newProduct);
+                            }    
+                        localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
+                        updateDashboard();
+                        alert('Products imported successfully!');
+                        fileInput.value = '';
+                    };
+                    reader.readAsText(file);
                 }
-                
-                // Save to localStorage
-                localStorage.setItem('productRecipes', JSON.stringify(productRecipes));
-                
-                // Update UI
-                loadProductOptions();
-                loadProductRecipes();
-                updateDashboard();
-                
-                alert('Products imported successfully!');
-                fileInput.value = '';
-            };
-            
-            reader.readAsText(file);
+            }
         }
 
         // Upload materials CSV
         function uploadMaterialsCSV() {
             const fileInput = document.getElementById('materialUpload');
             const file = fileInput.files[0];
-            
             if (!file) {
                 alert('Please select a file');
                 return;
@@ -1369,31 +1433,23 @@
             reader.onload = function(e) {
                 const contents = e.target.result;
                 const lines = contents.split('\n');
-                
                 // Skip header row
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
-                    
                     if (line) {
                         const columns = line.split(',');
-                        
                         if (columns.length >= 4) {
                             const name = columns[0].trim();
                             const qtyPerPack = parseInt(columns[1].trim());
                             const totalAmount = parseFloat(columns[2].trim());
                             const costPerPiece = parseFloat(columns[3].trim());
-                            
-                            // Create new material
                             const newMaterial = {
                                 name: name,
                                 qtyPerPack: qtyPerPack,
                                 totalAmount: totalAmount,
                                 costPerPiece: costPerPiece || totalAmount / qtyPerPack
                             };
-                            
-                            // Check if material already exists
                             const existingIndex = materials.findIndex(m => m.name === name);
-                            
                             if (existingIndex >= 0) {
                                 materials[existingIndex] = newMaterial;
                             } else {
@@ -1403,18 +1459,15 @@
                     }
                 }
                 
-                // Save to localStorage
+                // Save to localStorage  
                 localStorage.setItem('materials', JSON.stringify(materials));
                 
                 // Update UI
                 loadMaterialsDatabase();
                 loadMaterialOptions();
-                
-                // Recalculate product costs
                 recalculateProductCosts();
                 loadProductRecipes();
                 updateDashboard();
-                
                 alert('Materials imported successfully!');
                 fileInput.value = '';
             };
@@ -1424,48 +1477,44 @@
 
         // Export products to CSV
         function exportProducts() {
-            let csv = 'Name,Material1,Quantity1,Material2,Quantity2,Material3,Quantity3,Material4,Quantity4,Material5,Quantity5,TotalCost\n';
-            
+            let csv = 'Name,Material1,Quantity1,Material2,Quantity2,Material3,Quantity3,Material4,Quantity4,Material5,Quantity5,TotalCost\n';    
             productRecipes.forEach(product => {
                 csv += `${product.name},`;
-                
                 for (let i = 0; i < 5; i++) {
                     csv += `${product.materials[i] || "NONE"},${product.quantities[i] || ""},`;
                 }
-                
                 csv += `${product.totalCost}\n`;
             });
-            
             downloadCSV(csv, 'products.csv');
         }
 
         // Export materials to CSV
         function exportMaterials() {
             let csv = 'Name,QuantityPerPack,TotalAmount,CostPerPiece\n';
-            
             materials.forEach(material => {
                 if (material.name !== "NONE") {
                     csv += `${material.name},${material.qtyPerPack},${material.totalAmount},${material.costPerPiece}\n`;
                 }
             });
-            
             downloadCSV(csv, 'materials.csv');
         }
 
         // Helper function to download CSV
         function downloadCSV(csv, filename) {
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            
             if (navigator.msSaveBlob) { // IE 10+
                 navigator.msSaveBlob(blob, filename);
             } else {
-                const url = URL.createObjectURL(blob);
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const link = document.createElement('a');
+                if (link.download !== undefined) { // feature detection
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
             }
         }
     </script>

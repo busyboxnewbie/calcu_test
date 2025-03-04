@@ -275,7 +275,7 @@
                 <h2>PROFIT ANALYSIS</h2>
                 <div class="input-row">
                     <label for="profitMargin">PROFIT MARGIN (%):</label>
-                    <input type="number" id="profitMargin" class="input-field" value="60" min="0" max="1000" onchange="updateProfitDetails()">
+                    <input type="number" id="profitMargin" class="input-field" value="120" min="0" max="1000" onchange="updateProfitDetails()">
                 </div>
                 <div class="input-row">
                     <label>SUGGESTED SELLING PRICE:</label>
@@ -506,14 +506,13 @@
     <!-- Edit Product Modal -->
     <div id="editProductModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeProductModal()">&times;</span>
+            <span class="close-modal" onclick="closeModal('editProductModal')">&times;</span>
             <h2>Edit Product</h2>
             <div class="modal-grid">
                 <div class="form-group">
                     <label for="editProductName">Product Name:</label>
                     <input type="text" id="editProductName" required>
                 </div>
-                
                 <div class="form-group">
                     <label for="editMaterial1">Material 1:</label>
                     <select id="editMaterial1">
@@ -521,12 +520,10 @@
                         <!-- Options loaded dynamically -->
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="editQuantity1">Quantity 1:</label>
                     <input type="number" id="editQuantity1" step="0.01" min="0">
                 </div>
-                
                 <div class="form-group">
                     <label for="editMaterial2">Material 2:</label>
                     <select id="editMaterial2">
@@ -534,12 +531,10 @@
                         <!-- Options loaded dynamically -->
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="editQuantity2">Quantity 2:</label>
                     <input type="number" id="editQuantity2" step="0.01" min="0">
                 </div>
-                
                 <div class="form-group">
                     <label for="editMaterial3">Material 3:</label>
                     <select id="editMaterial3">
@@ -547,12 +542,10 @@
                         <!-- Options loaded dynamically -->
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="editQuantity3">Quantity 3:</label>
                     <input type="number" id="editQuantity3" step="0.01" min="0">
                 </div>
-                
                 <div class="form-group">
                     <label for="editMaterial4">Material 4:</label>
                     <select id="editMaterial4">
@@ -560,12 +553,10 @@
                         <!-- Options loaded dynamically -->
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="editQuantity4">Quantity 4:</label>
                     <input type="number" id="editQuantity4" step="0.01" min="0">
                 </div>
-                
                 <div class="form-group">
                     <label for="editMaterial5">Material 5:</label>
                     <select id="editMaterial5">
@@ -573,7 +564,6 @@
                         <!-- Options loaded dynamically -->
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label for="editQuantity5">Quantity 5:</label>
                     <input type="number" id="editQuantity5" step="0.01" min="0">
@@ -586,29 +576,25 @@
     <!-- Edit Material Modal -->
     <div id="editMaterialModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeMaterialModal()">&times;</span>
+            <span class="close-modal" onclick="closeModal('editMaterialModal')">&times;</span>
             <h2>Edit Material</h2>
             <div class="form-group">
                 <label for="editMaterialName">Material Name:</label>
                 <input type="text" id="editMaterialName" required>
             </div>
-            
             <div class="form-group">
                 <label for="editQtyPerPack">Quantity Per Pack:</label>
                 <input type="number" id="editQtyPerPack" min="0" required>
             </div>
-            
             <div class="form-group">
                 <label for="editTotalAmount">Total Amount Per Pack:</label>
                 <input type="number" id="editTotalAmount" step="0.01" min="0" required>
             </div>
-            
             <div class="form-group">
                 <label for="editCostPerPiece">Cost Per Piece:</label>
                 <input type="number" id="editCostPerPiece" step="0.01" min="0" disabled>
                 <small>This is calculated automatically</small>
             </div>
-            
             <button class="button" onclick="saveMaterialEdit()">Save Changes</button>
         </div>
     </div>
@@ -1164,7 +1150,7 @@ function showTab(tabId) {
             document.getElementById('editMaterialIndex').value = index;
             document.getElementById('editQtyPerPack').value = material.qtyPerPack;
             document.getElementById('editTotalAmount').value = material.totalAmount;
-            
+            document.getElementById('editCostPerPiece').value = material.costPerPiece.toFixed(2);
             document.getElementById('editMaterialModal').style.display = 'block';
         }
 

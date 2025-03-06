@@ -1520,10 +1520,290 @@ function showTab(tabId) {
                 }
             }
         }
+
+        // Function to parse CSV data into a usable format
+        function parseCSV(csvData) {
+            const lines = csvData.split('\n');
+            const headers = lines[0].split(',');
+            const result = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                const currentLine = lines[i].split(',');
+                if (currentLine.length <= 1) continue; // Skip empty lines
+                
+                const productName = currentLine[0];
+                const materials = [];
+                
+                // Process materials (they come in pairs: material name, quantity)
+                for (let j = 1; j < currentLine.length; j += 2) {
+                    const materialName = currentLine[j];
+                    const quantity = currentLine[j + 1];
+                    
+                    // Skip empty or "0" materials
+                    if (materialName && materialName !== "0" && materialName.toLowerCase() !== "n/a") {
+                        materials.push({
+                            material: materialName,
+                            quantity: quantity,
+                            cost: 0 // Default cost, will be updated from material prices
+                        });
+                    }
+                }
+                
+                result[productName] = materials;
+            }
+            
+            return result;
+        }
+
+        // Material prices lookup (you should expand this with all your materials)
+        const materialPrices = {
+            "Quaff Glossy/Matte Sticker Photo Paper - 90 GSM": 6.00,
+            "Paper One A4 - 80 GSM": 0.51, // Per sheet
+            "Garter": 1.39,
+            "Quaff Photo Top A4 - Glossy": 6.50,
+            "Chipboard 2MM": 9.50,
+            "Hard Copy A4 - 70 GSM": 0.46, // Per sheet
+            "Double Loop Wire BLACK/WHITE - 9.5MM (75S)": 12.00,
+            "Double Loop Wire BLACK/WHITE - 11.1MM (95S)": 14.00,
+            "Double Loop Wire BLACK/WHITE - 12.7MM (105S)": 16.00,
+            "Quaff No Back Print Glossy Photo Paper A4 - 230 GSM": 8.00,
+            "Quaff No Back Print Glossy Photo Paper A4 - 200 GSM": 7.50,
+            "Laminated Film - 125 mic": 5.00,
+            "QUAFF Photo Paper A4 - 115 GSM": 4.50,
+            "Paper One A4 - 70 GSM": 0.46 // Per sheet
+        };
+
+        // Fetch and load the product recipes
+        let products = {};
+
+        // Normally you would fetch this from a server, but for now we'll use the embedded CSV data
+        const csvData = `Name,Material 1,Quantity 1,Material 2,Quantity 2,Material 3,Quantity 3,Material 4,Quantity 4,Material 5,Quantity 5
+        Avanti - NB Format (60S),Quaff No Back Print Glossy Photo Paper A4 - 230 GSM,1,Paper One A4 - 70 GSM,60 Sheets,Double Loop Wire BLACK/WHITE - 9.5MM (75S),1,Quaff Photo Top A4 - Glossy,1,0,0
+        Avanti - NB Format (80S),Quaff No Back Print Glossy Photo Paper A4 - 230 GSM,1,Paper One A4 - 70 GSM,80 Sheets,Double Loop Wire BLACK/WHITE - 11.1MM (95S),1,Quaff Photo Top A4 - Glossy,1,0,0
+        Avanti - NB Format (100S),Quaff No Back Print Glossy Photo Paper A4 - 230 GSM,1,Paper One A4 - 70 GSM,100 Sheets,Double Loop Wire BLACK/WHITE - 12.7MM (105S),1,Quaff Photo Top A4 - Glossy,1,0,0
+        Notepad (HB) 100 sheets,Quaff Glossy/Matte Sticker Photo Paper - 90 GSM,1,Paper One A4 - 80 GSM,100 Sheets,Garter,1,Quaff Photo Top A4 - Glossy,1,Chipboard 2MM,1`;
+
+        products = parseCSV(csvData);
+
+        // Calculate costs based on quantity and material prices
+        function calculateMaterialCosts() {
+            for (const productName in products) {
+                const materials = products[productName];
+                
+                materials.forEach(material => {
+                    const materialName = material.material;
+                    const quantity = material.quantity;
+                    
+                    // Check if material price exists
+                    if (materialPrices[materialName]) {
+                        // Handle different quantity formats
+                        if (typeof quantity === 'string' && quantity.includes('Sheets')) {
+                            const sheets = parseInt(quantity);
+                            material.cost = materialPrices[materialName] * sheets;
+                        } else {
+                            const qty = parseInt(quantity) || 1;
+                            material.cost = materialPrices[materialName] * qty;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Display materials for selected product
+        function displayMaterials() {
+            const productName = document.getElementById("productSelect").value;
+            const materialsForProduct = products[productName] || [];
+            
+            const materialsTable = document.getElementById("materialsTable");
+            const tbody = materialsTable.getElementsByTagName("tbody")[0];
+            
+            // Clear existing rows
+            tbody.innerHTML = "";
+            
+            let materialTotalCost = 0;
+            
+            materialsForProduct.forEach((item, index) => {
+                const row = tbody.insertRow();
+                
+                // Material cell
+                const materialCell = row.insertCell(0);
+                materialCell.textContent = item.material;
+                
+                // Quantity cell
+                const quantityCell = row.insertCell(1);
+                quantityCell.textContent = item.quantity;
+                
+                // Cost cell
+                const costCell = row.insertCell(2);
+                costCell.textContent = `₱${item.cost.toFixed(2)}`;
+                
+                // Actions cell with working buttons
+                const actionsCell = row.insertCell(3);
+                
+                // Edit button
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Edit";
+                editBtn.className = "btn btn-primary btn-sm";
+                editBtn.onclick = function() {
+                    editMaterial(productName, index);
+                };
+                actionsCell.appendChild(editBtn);
+                
+                // Delete button
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "Delete";
+                deleteBtn.className = "btn btn-danger btn-sm ml-2";
+                deleteBtn.onclick = function() {
+                    deleteMaterial(productName, index);
+                };
+                actionsCell.appendChild(deleteBtn);
+                
+                materialTotalCost += item.cost;
+            });
+            
+            // Update material total
+            document.getElementById("totalCost").textContent = `₱${materialTotalCost.toFixed(2)}`;
+            
+            // Calculate additional costs
+            const inkCost = materialTotalCost * 0.03;
+            const bufferCost = materialTotalCost * 0.05;
+            const wasteCost = materialTotalCost * 0.05;
+            
+            document.getElementById("inkCost").textContent = `₱${inkCost.toFixed(2)}`;
+            document.getElementById("bufferCost").textContent = `₱${bufferCost.toFixed(2)}`;
+            document.getElementById("wasteInkCost").textContent = `₱${wasteCost.toFixed(2)}`;
+            
+            const totalCost = materialTotalCost + inkCost + bufferCost + wasteCost;
+            document.getElementById("finalTotalCost").textContent = `₱${totalCost.toFixed(2)}`;
+        }
+
+        // Function to handle editing a material
+        function editMaterial(productName, index) {
+            const material = products[productName][index];
+            
+            // Populate the edit form
+            document.getElementById("edit-material-name").value = material.material;
+            document.getElementById("edit-material-quantity").value = material.quantity;
+            document.getElementById("edit-material-cost").value = material.cost;
+            
+            // Store reference to the material being edited
+            document.getElementById("edit-form").dataset.productName = productName;
+            document.getElementById("edit-form").dataset.index = index;
+            
+            // Show the edit modal
+            const editModal = new bootstrap.Modal(document.getElementById("editMaterialModal"));
+            editModal.show();
+        }
+
+        // Function to save edited material
+        function saveMaterial() {
+            const form = document.getElementById("edit-form");
+            const productName = form.dataset.productName;
+            const index = parseInt(form.dataset.index);
+            
+            const materialName = document.getElementById("edit-material-name").value;
+            const quantity = document.getElementById("edit-material-quantity").value;
+            const cost = parseFloat(document.getElementById("edit-material-cost").value);
+            
+            if (!materialName || !quantity || isNaN(cost)) {
+                alert("Please enter valid values");
+                return;
+            }
+            
+            // Update the material
+            products[productName][index] = {
+                material: materialName,
+                quantity: quantity,
+                cost: cost
+            };
+            
+            // Close the modal
+            const editModal = bootstrap.Modal.getInstance(document.getElementById("editMaterialModal"));
+            editModal.hide();
+            
+            // Update the display
+            displayMaterials();
+        }
+
+        // Function to delete a material
+        function deleteMaterial(productName, index) {
+            if (confirm("Are you sure you want to delete this material?")) {
+                products[productName].splice(index, 1);
+                displayMaterials();
+            }
+        }
+
+        // Initialize the product dropdown
+        function initializeProductDropdown() {
+            const productSelect = document.getElementById("productSelect");
+            
+            // Clear existing options
+            productSelect.innerHTML = "";
+            
+            // Add options for each product
+            for (const productName in products) {
+                const option = document.createElement("option");
+                option.value = productName;
+                option.textContent = productName;
+                productSelect.appendChild(option);
+            }
+        }
+
+        // Add event listeners when the page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            // Calculate costs for materials
+            calculateMaterialCosts();
+            
+            // Initialize product dropdown
+            initializeProductDropdown();
+            
+            // Display materials when product changes
+            document.getElementById("productSelect").addEventListener("change", displayMaterials);
+            
+            // Handle save button click
+            document.getElementById("save-material-btn").addEventListener("click", saveMaterial);
+            
+            // Handle add material form submission
+            document.getElementById("add-material-form").addEventListener("submit", function(e) {
+                e.preventDefault();
+                
+                const productName = document.getElementById("productSelect").value;
+                const materialName = document.getElementById("material-name").value;
+                const quantity = document.getElementById("material-quantity").value;
+                const cost = parseFloat(document.getElementById("material-cost").value);
+                
+                if (!materialName || !quantity || isNaN(cost)) {
+                    alert("Please enter valid values");
+                    return;
+                }
+                
+                // Add the new material
+                if (!products[productName]) {
+                    products[productName] = [];
+                }
+                
+                products[productName].push({
+                    material: materialName,
+                    quantity: quantity,
+                    cost: cost
+                });
+                
+                // Clear the form
+                document.getElementById("material-name").value = "";
+                document.getElementById("material-quantity").value = "";
+                document.getElementById("material-cost").value = "";
+                
+                // Update the display
+                displayMaterials();
+            });
+            
+            // Initial display of materials
+            displayMaterials();
+        });
     </script>
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
     <script src="scripts.js"></script>
 </body>
-</html>  
+</html>
